@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SMART Launch</title>
+  <!-- SMART client (modern) -->
+  <script src="https://unpkg.com/fhirclient/build/fhir-client.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>body{font-family:ui-sans-serif,system-ui;margin:2rem}</style>
+</head>
+<body>
+  <h1>Launching…</h1>
+  <p id="msg">Redirecting to your health system for sign-in.</p>
+
+  <script>
+    // ====== EDIT THESE FOR YOUR ENVIRONMENT ======
+    const CLIENT_ID   = "62ceaaa1-aba7-468f-a246-87f614f9550b";
+    // Cerner demo tenant example (replace with yours if different):
+    // const DEFAULT_ISS = "https://fhir-myrecord.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d";
+    const DEFAULT_ISS = "https://fhir-myrecord.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d";
+    // If you deploy to GitHub Pages, this is typically "/<repo>/redirect.html"
+    const REDIRECT_URI = "./redirect.html";
+
+    // Patient-app scopes (request the minimum you need)
+    const SCOPES = [
+      "openid", "profile", "fhirUser",
+      "patient/*.read",
+      // Optional:
+      // "offline_access",   // if refresh tokens are enabled for your app
+      // "launch/patient"    // useful when launched from the EHR with patient context
+    ].join(" ");
+
+    // ====== DETECT LAUNCH CONTEXT ======
+    const params = new URLSearchParams(window.location.search);
+    const launch = params.get("launch"); // present when EHR-launched
+    const iss    = params.get("iss") || DEFAULT_ISS;
+
+    // Build authorize options
+    const authorizeOpts = {
+      clientId:    CLIENT_ID,
+      scope:       SCOPES,
+      redirectUri: REDIRECT_URI,
+      // Either iss (standalone) or both iss+launch (EHR-launched)
+      iss
+    };
+    if (launch) authorizeOpts.launch = launch;
+
+    // Start SMART authorization (PKCE is handled by the library)
+    FHIR.oauth2.authorize(authorizeOpts).catch(err => {
+      console.error(err);
+      document.getElementById("msg").textContent =
+        "Launch failed. See console for details.";
+    });
+  </script>
+</body>
+</html>

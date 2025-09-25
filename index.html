@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Patient App</title>
+  <script src="https://unpkg.com/fhirclient/build/fhir-client.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{font-family:ui-sans-serif,system-ui;margin:2rem}
+    code{background:#f5f5f5;padding:.25rem .5rem;border-radius:.25rem}
+  </style>
+</head>
+<body>
+  <h1>Patient Overview</h1>
+  <div id="out">Loading…</div>
+
+  <script>
+    FHIR.oauth2.ready().then(async client => {
+      try {
+        const patientId = client.getPatientId();
+        const patient   = await client.request(`Patient/${patientId}`);
+        const name = (patient.name?.[0]?.text)
+          || [patient.name?.[0]?.given?.join(" "), patient.name?.[0]?.family].filter(Boolean).join(" ")
+          || patientId;
+
+        document.getElementById("out").innerHTML =
+          `Signed in as <strong>${name}</strong> <br><br>` +
+          `<small>Patient ID: <code>${patientId}</code></small>`;
+      } catch (e) {
+        console.error(e);
+        document.getElementById("out").textContent = "Failed to load patient.";
+      }
+    });
+  </script>
+</body>
+</html>

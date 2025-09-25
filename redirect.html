@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SMART Redirect</title>
+  <script src="https://unpkg.com/fhirclient/build/fhir-client.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>body{font-family:ui-sans-serif,system-ui;margin:2rem}</style>
+</head>
+<body>
+  <h1>Finishing sign-in…</h1>
+  <p id="msg">Processing authorization response.</p>
+
+  <script>
+    // Where to go after we have a client — change if your entry page differs
+    const APP_ENTRY = "./index.html";
+
+    // Finalize the SMART launch & create a client instance
+    FHIR.oauth2.ready()
+      .then(client => {
+        // Optional: keep token for quick inspection during dev
+        try {
+          sessionStorage.setItem("tokenResponse", JSON.stringify(client.state.tokenResponse));
+        } catch (_) {}
+
+        // Forward into your app
+        window.location.replace(APP_ENTRY);
+      })
+      .catch(err => {
+        console.error("SMART redirect error:", err);
+        document.getElementById("msg").textContent =
+          "Authorization failed. See console for details.";
+      });
+  </script>
+</body>
+</html>
