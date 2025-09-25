@@ -1,56 +1,22 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
+
 <head>
-  <meta charset="utf-8" />
-  <title>SMART Launch</title>
-  <!-- SMART client (modern) -->
-  <script src="https://unpkg.com/fhirclient/build/fhir-client.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>body{font-family:ui-sans-serif,system-ui;margin:2rem}</style>
+	<script src='fhir-client-v2.js'>
+	</script>
 </head>
+
 <body>
-  <h1>Launching…</h1>
-  <p id="msg">Redirecting to your health system for sign-in.</p>
+	<p>Hello, I am the page "launch.html"</p>
 
-  <script>
-    // ====== EDIT THESE FOR YOUR ENVIRONMENT ======
-    const CLIENT_ID   = "62ceaaa1-aba7-468f-a246-87f614f9550b";
-    // Cerner demo tenant example (replace with yours if different):
-    // const DEFAULT_ISS = "https://fhir-myrecord.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d";
-    const DEFAULT_ISS = "https://fhir-myrecord.cerner.com/r4/ec2458f2-1e24-41c8-b71b-0e701af7583d";
-    // If you deploy to GitHub Pages, this is typically "/<repo>/redirect.html"
-    const REDIRECT_URI = "./redirect.html";
-
-    // Patient-app scopes (request the minimum you need)
-    const SCOPES = [
-      "openid", "profile", "fhirUser",
-      "patient/*.read",
-      // Optional:
-      // "offline_access",   // if refresh tokens are enabled for your app
-      // "launch/patient"    // useful when launched from the EHR with patient context
-    ].join(" ");
-
-    // ====== DETECT LAUNCH CONTEXT ======
-    const params = new URLSearchParams(window.location.search);
-    const launch = params.get("launch"); // present when EHR-launched
-    const iss    = params.get("iss") || DEFAULT_ISS;
-
-    // Build authorize options
-    const authorizeOpts = {
-      clientId:    CLIENT_ID,
-      scope:       SCOPES,
-      redirectUri: REDIRECT_URI,
-      // Either iss (standalone) or both iss+launch (EHR-launched)
-      iss
-    };
-    if (launch) authorizeOpts.launch = launch;
-
-    // Start SMART authorization (PKCE is handled by the library)
-    FHIR.oauth2.authorize(authorizeOpts).catch(err => {
-      console.error(err);
-      document.getElementById("msg").textContent =
-        "Launch failed. See console for details.";
+	<script>
+		FHIR.oauth2.authorize({
+      'client_id': '6ee89772-618f-4904-92b8-94594e868e9c',
+      'scope':  'patient/AllergyIntolerance.read patient/Appointment.read patient/Binary.read patient/CarePlan.read patient/Condition.read patient/Contract.read patient/Device.read patient/DiagnosticReport.read patient/DocumentReference.read patient/Encounter.read patient/Goal.read patient/Immunization.read patient/MedicationAdministration.read patient/MedicationOrder.read patient/MedicationStatement.read patient/Observation.read patient/Patient.read patient/Person.read patient/Procedure.read patient/ProcedureRequest.read patient/RelatedPerson.read patient/Schedule.read patient/Slot.read patient/launch',
+      'redirect_uri': 'https://fhirIntro.patientdev.repl.co/app.html'
     });
-  </script>
+	</script>
+
 </body>
+
 </html>
